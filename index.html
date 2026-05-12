@@ -40,7 +40,6 @@
         .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s; position: relative; }
         .card:hover { transform: translateY(-3px); border-color: white; }
 
-        /* Urgency Card Styles */
         .card.is-today { background: var(--today-bg); border: 2px solid var(--today-border); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
         .card.is-tomorrow { border: 2px solid var(--urgent); animation: pulse-red 2s infinite; }
         .card.is-soon { border: 1px solid var(--soon); }
@@ -51,21 +50,18 @@
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
-        .footer { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--dim); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 10px; }
+        .footer { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--dim); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 10px; align-items: center; }
 
-        /* Library Styles (RESTORED ALL) */
         .library-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
         .resource-card { background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 18px; text-decoration: none; color: inherit; transition: 0.2s; text-align: center; }
         .resource-card:hover { background: #24324d; border-color: var(--acc); }
         .resource-card h4 { margin: 0; font-size: 0.95rem; color: white; }
 
-        /* Countdown Page */
         .countdown-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .milestone-card { background: var(--card); padding: 30px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .days-number { font-size: 4rem; font-weight: 900; display: block; color: white; margin: 10px 0; }
         .milestone-date { color: var(--dim); font-size: 0.8rem; }
 
-        /* Modal */
         .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display:none; justify-content:center; align-items:center; z-index:100; backdrop-filter: blur(5px); }
         .modal { background: var(--card); padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; border: 1px solid var(--acc); }
         .p-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
@@ -74,6 +70,7 @@
         .pm { background: #a78bfa; color: #1e1b4b; }
         .priority-options { display: flex; gap: 5px; margin-top: 20px; }
         .p-opt { flex: 1; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-weight: bold; color: white; }
+        .start-time { color: var(--acc); font-weight: bold; font-size: 0.75rem; margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -171,28 +168,28 @@
 
 <script>
     const exams = [
-        { id: 0, n: "English Literature P1", b: "AQA", d: new Date(2026, 4, 11), s: "AM", t: ["Macbeth", "Jekyll and Hyde"] },
-        { id: 1, n: "Biology Paper 1", b: "AQA", d: new Date(2026, 4, 12), s: "PM", t: ["Cell Biology", "Organisation", "Infection", "Bioenergetics"] },
-        { id: 2, n: "Computer Science P1", b: "OCR", d: new Date(2026, 4, 13), s: "PM", t: ["Computer Systems"] },
-        { id: 3, n: "Maths Paper 1", b: "Pearson", d: new Date(2026, 4, 14), s: "AM", t: ["Non-Calculator"] },
-        { id: 4, n: "History Paper 1", b: "Pearson", d: new Date(2026, 4, 15), s: "AM", t: ["Medicine in Britain"] },
-        { id: 5, n: "Chemistry Paper 1", b: "AQA", d: new Date(2026, 4, 18), s: "AM", t: ["Atomic Structure", "Bonding", "Energy Changes"] },
-        { id: 6, n: "English Literature P2", b: "AQA", d: new Date(2026, 4, 19), s: "AM", t: ["Inspector Calls", "Poetry"] },
-        { id: 7, n: "Computer Science P2", b: "OCR", d: new Date(2026, 4, 19), s: "PM", t: ["Algorithms", "Programming"] },
-        { id: 8, n: "English Language P1", b: "AQA", d: new Date(2026, 4, 21), s: "AM", t: ["Creative Writing"] },
-        { id: 9, n: "Engineering", b: "AQA", d: new Date(2026, 5, 1), s: "AM", t: ["All Topics"] },
-        { id: 10, n: "Physics Paper 1", b: "AQA", d: new Date(2026, 5, 2), s: "AM", t: ["Energy", "Electricity", "Atomic Structure"] },
-        { id: 11, n: "Maths Paper 2", b: "Pearson", d: new Date(2026, 5, 3), s: "AM", t: ["Calculator Topics"] },
-        { id: 12, n: "History Paper 2", b: "Pearson", d: new Date(2026, 5, 4), s: "AM", t: ["Cold War", "Norman England"] },
-        { id: 13, n: "English Language P2", b: "AQA", d: new Date(2026, 5, 5), s: "AM", t: ["Non-Fiction Writing"] },
-        { id: 14, n: "Biology Paper 2", b: "AQA", d: new Date(2026, 5, 8), s: "AM", t: ["Homeostasis", "Inheritance", "Ecology"] },
-        { id: 15, n: "Spanish Listening", b: "Pearson", d: new Date(2026, 5, 9), s: "AM", t: ["All Topics"] },
-        { id: 16, n: "History Paper 3", b: "Pearson", d: new Date(2026, 5, 9), s: "PM", t: ["Weimar/Nazi Germany"] },
-        { id: 17, n: "Maths Paper 3", b: "Pearson", d: new Date(2026, 5, 10), s: "AM", t: ["Calculator Topics"] },
-        { id: 18, n: "Chemistry Paper 2", b: "AQA", d: new Date(2026, 5, 12), s: "AM", t: ["Organic", "Atmosphere"] },
-        { id: 19, n: "Physics Paper 2", b: "AQA", d: new Date(2026, 5, 15), s: "AM", t: ["Forces", "Waves", "Magnetism"] },
-        { id: 20, n: "Spanish Reading", b: "Pearson", d: new Date(2026, 5, 16), s: "AM", t: ["All Topics"] },
-        { id: 21, n: "Spanish Writing", b: "Pearson", d: new Date(2026, 5, 17), s: "AM", t: ["All Topics"] }
+        { id: 0, n: "English Literature P1", b: "AQA", d: new Date(2026, 4, 11), s: "AM", t: ["Macbeth", "Jekyll and Hyde"], st: "09:00 AM" },
+        { id: 1, n: "Biology Paper 1", b: "AQA", d: new Date(2026, 4, 12), s: "PM", t: ["Cell Biology", "Organisation", "Infection", "Bioenergetics"], st: "01:15 PM" },
+        { id: 2, n: "Computer Science P1", b: "OCR", d: new Date(2026, 4, 13), s: "PM", t: ["Computer Systems"], st: "01:15 PM" },
+        { id: 3, n: "Maths Paper 1", b: "Pearson", d: new Date(2026, 4, 14), s: "AM", t: ["Non-Calculator"], st: "09:00 AM" },
+        { id: 4, n: "History Paper 1", b: "Pearson", d: new Date(2026, 4, 15), s: "AM", t: ["Medicine in Britain"], st: "09:00 AM" },
+        { id: 5, n: "Chemistry Paper 1", b: "AQA", d: new Date(2026, 4, 18), s: "AM", t: ["Atomic Structure", "Bonding", "Energy Changes"], st: "09:00 AM" },
+        { id: 6, n: "English Literature P2", b: "AQA", d: new Date(2026, 4, 19), s: "AM", t: ["Inspector Calls", "Poetry"], st: "09:00 AM" },
+        { id: 7, n: "Computer Science P2", b: "OCR", d: new Date(2026, 4, 19), s: "PM", t: ["Algorithms", "Programming"], st: "01:15 PM" },
+        { id: 8, n: "English Language P1", b: "AQA", d: new Date(2026, 4, 21), s: "AM", t: ["Creative Writing"], st: "09:00 AM" },
+        { id: 9, n: "Engineering", b: "AQA", d: new Date(2026, 5, 1), s: "AM", t: ["All Topics"], st: "09:00 AM" },
+        { id: 10, n: "Physics Paper 1", b: "AQA", d: new Date(2026, 5, 2), s: "AM", t: ["Energy", "Electricity", "Atomic Structure"], st: "09:00 AM" },
+        { id: 11, n: "Maths Paper 2", b: "Pearson", d: new Date(2026, 5, 3), s: "AM", t: ["Calculator Topics"], st: "09:00 AM" },
+        { id: 12, n: "History Paper 2", b: "Pearson", d: new Date(2026, 5, 4), s: "AM", t: ["Cold War", "Norman England"], st: "09:00 AM" },
+        { id: 13, n: "English Language P2", b: "AQA", d: new Date(2026, 5, 5), s: "AM", t: ["Non-Fiction Writing"], st: "09:00 AM" },
+        { id: 14, n: "Biology Paper 2", b: "AQA", d: new Date(2026, 5, 8), s: "AM", t: ["Homeostasis", "Inheritance", "Ecology"], st: "09:00 AM" },
+        { id: 15, n: "Spanish Listening", b: "Pearson", d: new Date(2026, 5, 9), s: "AM", t: ["All Topics"], st: "09:15 AM" },
+        { id: 16, n: "History Paper 3", b: "Pearson", d: new Date(2026, 5, 9), s: "PM", t: ["Weimar/Nazi Germany"], st: "01:15 PM" },
+        { id: 17, n: "Maths Paper 3", b: "Pearson", d: new Date(2026, 5, 10), s: "AM", t: ["Calculator Topics"], st: "09:00 AM" },
+        { id: 18, n: "Chemistry Paper 2", b: "AQA", d: new Date(2026, 5, 12), s: "AM", t: ["Organic", "Atmosphere"], st: "09:00 AM" },
+        { id: 19, n: "Physics Paper 2", b: "AQA", d: new Date(2026, 5, 15), s: "AM", t: ["Forces", "Waves", "Magnetism"], st: "09:00 AM" },
+        { id: 20, n: "Spanish Reading", b: "Pearson", d: new Date(2026, 5, 16), s: "AM", t: ["All Topics"], st: "09:15 AM" },
+        { id: 21, n: "Spanish Writing", b: "Pearson", d: new Date(2026, 5, 17), s: "AM", t: ["All Topics"], st: "09:00 AM" }
     ];
 
     let userPriorities = JSON.parse(localStorage.getItem('gcse_priorities')) || {};
@@ -235,11 +232,18 @@
             card.className = `card ${urgencyClass}`;
             card.onclick = () => openModal(e);
             card.innerHTML = `<span class="card-title"><span class="p-dot" style="background:${pColor}"></span>${e.n}</span>
-                <div class="footer"><span>${e.b} • ${e.d.toLocaleDateString('en-GB', {day:'numeric', month:'short'})}</span><span class="session-badge ${e.s.toLowerCase()}">${e.s}</span></div>`;
+                <div class="footer">
+                    <span>${e.b} • ${e.d.toLocaleDateString('en-GB', {day:'numeric', month:'short'})}</span>
+                    <div>
+                        <span class="start-time">${e.st}</span>
+                        <span class="session-badge ${e.s.toLowerCase()}">${e.s}</span>
+                    </div>
+                </div>`;
             g.appendChild(card);
         });
 
         const nextSub = visibleFuture.find(ex => ex.d.getTime() !== today.getTime());
+        // Time removed from the next subject banner text [cite: 3, 4]
         document.getElementById('next-subject-text').innerText = nextSub ? nextSub.n : "Finished!";
     }
 
@@ -263,7 +267,7 @@
     function openModal(e) {
         currentExamId = e.id;
         document.getElementById('m-title').innerText = e.n;
-        document.getElementById('m-list').innerHTML = e.t.map(x => `<li>→ ${x}</li>`).join('');
+        document.getElementById('m-list').innerHTML = `<li><strong>Time:</strong> ${e.st}</li>` + e.t.map(x => `<li>→ ${x}</li>`).join('');
         document.getElementById('overlay').style.display = 'flex';
     }
 
