@@ -25,9 +25,13 @@
         .action-banner { background: linear-gradient(90deg, #1e293b 0%, #24324d 100%); padding: 25px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--acc); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
         .next-info h3 { margin: 0; font-size: 0.75rem; text-transform: uppercase; color: var(--acc); letter-spacing: 1px; }
         .next-info p { margin: 5px 0 0 0; font-size: 1.3rem; font-weight: bold; }
+        
         .controls { display: flex; align-items: center; gap: 15px; }
+        
         .timer-group { text-align: center; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; }
-        #timer-display { font-size: 1.6rem; font-weight: bold; font-variant-numeric: tabular-nums; display: block; margin-bottom: 5px;}
+        #timer-display { font-size: 1.6rem; font-weight: bold; font-variant-numeric: tabular-nums; display: block; margin-bottom: 8px;}
+        .timer-input-group { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
         .timer-input { width: 45px; background: rgba(0,0,0,0.3); border: 1px solid #475569; color: white; border-radius: 4px; padding: 4px; text-align: center; }
         .t-btn { background: var(--acc); color: var(--bg); border: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
         
@@ -243,7 +247,6 @@
         });
 
         const nextSub = visibleFuture.find(ex => ex.d.getTime() !== today.getTime());
-        // Time removed from the next subject banner text [cite: 3, 4]
         document.getElementById('next-subject-text').innerText = nextSub ? nextSub.n : "Finished!";
     }
 
