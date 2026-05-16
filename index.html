@@ -30,17 +30,43 @@
         
         .timer-group { text-align: center; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; }
         #timer-display { font-size: 1.6rem; font-weight: bold; font-variant-numeric: tabular-nums; display: block; margin-bottom: 8px;}
-        .timer-input-group { display: flex; align-items: center; justify-content: center; gap: 8px; }
         
-        .timer-input { width: 45px; background: rgba(0,0,0,0.3); border: 1px solid #475569; color: white; border-radius: 4px; padding: 4px; text-align: center; }
-        .t-btn { background: var(--acc); color: var(--bg); border: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
+        .timer-input-group { display: flex; align-items: stretch; justify-content: center; gap: 8px; }
+        
+        .timer-input { 
+            width: 45px; 
+            height: 28px; 
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid #475569; 
+            color: white; 
+            border-radius: 4px; 
+            padding: 0 4px; 
+            text-align: center; 
+            box-sizing: border-box;
+            font-size: 0.8rem;
+        }
+        
+        .t-btn { 
+            height: 28px; 
+            background: var(--acc); 
+            color: var(--bg); 
+            border: none; 
+            padding: 0 12px; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 0.7rem; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         
         .progress-container { margin-bottom: 30px; }
         .progress-text { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; font-weight: bold; }
         .progress-bg { background: #334155; height: 12px; border-radius: 10px; overflow: hidden; }
         #progress-fill { background: linear-gradient(90deg, var(--acc), #818cf8); height: 100%; width: 0%; transition: width 1s ease-in-out; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s; position: relative; }
         .card:hover { transform: translateY(-3px); border-color: white; }
 
@@ -54,7 +80,9 @@
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
-        .footer { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--dim); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 10px; align-items: center; }
+        .footer { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--dim); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 10px; align-items: flex-end; }
+        .footer-left { display: flex; flex-direction: column; gap: 4px; }
+        .footer-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 
         .library-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
         .resource-card { background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 18px; text-decoration: none; color: inherit; transition: 0.2s; text-align: center; }
@@ -74,7 +102,9 @@
         .pm { background: #a78bfa; color: #1e1b4b; }
         .priority-options { display: flex; gap: 5px; margin-top: 20px; }
         .p-opt { flex: 1; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-weight: bold; color: white; }
-        .start-time { color: var(--acc); font-weight: bold; font-size: 0.75rem; margin-right: 5px; }
+        .time-badge { color: var(--dim); font-size: 0.75rem; }
+        .time-highlight { color: var(--acc); font-weight: bold; }
+        .seat-badge { background: #475569; color: white; font-size: 0.7rem; padding: 1px 5px; border-radius: 3px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -160,7 +190,7 @@
 <div class="modal-overlay" id="overlay" onclick="this.style.display='none'">
     <div class="modal" onclick="event.stopPropagation()">
         <h2 id="m-title" style="margin-top:0; color:var(--acc);"></h2>
-        <ul id="m-list" style="text-align:left; padding:0; list-style:none;"></ul>
+        <ul id="m-list" style="text-align:left; padding:0; list-style:none; line-height: 1.6;"></ul>
         <div class="priority-options">
             <button class="p-opt" style="background:var(--dim)" onclick="updatePriority(0)">Clear</button>
             <button class="p-opt" style="background:var(--p-low)" onclick="updatePriority(1)">Easy</button>
@@ -171,35 +201,54 @@
 </div>
 
 <script>
+    // Data populated and updated directly from ExamTimetable.pdf
     const exams = [
-        { id: 0, n: "English Literature P1", b: "AQA", d: new Date(2026, 4, 11), s: "AM", t: ["Macbeth", "Jekyll and Hyde"], st: "09:00" },
-        { id: 1, n: "Biology Paper 1", b: "AQA", d: new Date(2026, 4, 12), s: "PM", t: ["Cell Biology", "Organisation", "Infection and Response", "Bioenergetics"], st: "01:15" },
-        { id: 2, n: "Computer Science P1", b: "OCR", d: new Date(2026, 4, 13), s: "PM", t: ["Computer Systems"], st: "01:15" },
-        { id: 3, n: "Maths Paper 1", b: "Pearson", d: new Date(2026, 4, 14), s: "AM", t: ["Non-Calculator: All Topics"], st: "09:00" },
-        { id: 4, n: "History Paper 1", b: "Pearson", d: new Date(2026, 4, 15), s: "AM", t: ["Medicine in Britain/Western Front"], st: "09:00" },
-        { id: 5, n: "Chemistry Paper 1", b: "AQA", d: new Date(2026, 4, 18), s: "AM", t: ["Atomic Structure", "Bonding", "Quantitative Chemistry", "Chemical Changes", "Energy Changes"], st: "09:00" },
-        { id: 6, n: "English Literature P2", b: "AQA", d: new Date(2026, 4, 19), s: "AM", t: ["Inspector Calls", "Power and Conflict Poetry", "Unseen Poetry"], st: "09:00" },
-        { id: 7, n: "Computer Science P2", b: "OCR", d: new Date(2026, 4, 19), s: "PM", t: ["Computational Thinking", "Algorithms", "Programming"], st: "01:15" },
-        { id: 8, n: "English Language P1", b: "AQA", d: new Date(2026, 4, 21), s: "AM", t: ["Creative Writing", "Analysis"], st: "09:00" },
-        { id: 9, n: "Engineering", b: "AQA", d: new Date(2026, 5, 1), s: "AM", t: ["All Topics"], st: "09:00" },
-        { id: 10, n: "Physics Paper 1", b: "AQA", d: new Date(2026, 5, 2), s: "AM", t: ["Energy", "Electricity", "Particle Model", "Atomic Structure"], st: "09:00" },
-        { id: 11, n: "Maths Paper 2", b: "Pearson", d: new Date(2026, 5, 3), s: "AM", t: ["Calculator: All Topics"], st: "09:00" },
-        { id: 12, n: "History Paper 2", b: "Pearson", d: new Date(2026, 5, 4), s: "AM", t: ["Cold War", "Anglo-Saxon and Norman England"], st: "09:00" },
-        { id: 13, n: "English Language P2", b: "AQA", d: new Date(2026, 5, 5), s: "AM", t: ["Non-Fiction Writing"], st: "09:00" },
-        { id: 14, n: "Biology Paper 2", b: "AQA", d: new Date(2026, 5, 8), s: "AM", t: ["Homeostasis", "Inheritance", "Ecology"], st: "09:00" },
-        { id: 15, n: "Spanish Listening", b: "Pearson", d: new Date(2026, 5, 9), s: "AM", t: ["All Topics"], st: "09:15" },
-        { id: 16, n: "History Paper 3", b: "Pearson", d: new Date(2026, 5, 9), s: "PM", t: ["Weimar and Nazi Germany"], st: "01:15" },
-        { id: 17, n: "Maths Paper 3", b: "Pearson", d: new Date(2026, 5, 10), s: "AM", t: ["Calculator: All Topics"], st: "09:00" },
-        { id: 18, n: "Chemistry Paper 2", b: "AQA", d: new Date(2026, 5, 12), s: "AM", t: ["Rates", "Organic", "Analysis", "Atmosphere", "Resources"], st: "09:00" },
-        { id: 19, n: "Physics Paper 2", b: "AQA", d: new Date(2026, 5, 15), s: "AM", t: ["Forces", "Waves", "Magnetism"], st: "09:00" },
-        { id: 20, n: "Spanish Reading", b: "Pearson", d: new Date(2026, 5, 16), s: "AM", t: ["All Topics"], st: "09:15" },
-        { id: 21, n: "Spanish Writing", b: "Pearson", d: new Date(2026, 5, 17), s: "AM", t: ["All Topics"], st: "09:00" }
+        { id: 0, n: "English Literature P1", b: "AQA", d: new Date(2026, 4, 11), s: "AM", t: ["Macbeth", "Jekyll and Hyde"], st: "09:00", se: "G14", dur: "1hr 45m" },
+        { id: 1, n: "Biology Paper 1", b: "AQA", d: new Date(2026, 4, 12), s: "PM", t: ["Cell Biology", "Organisation", "Infection and Response", "Bioenergetics"], st: "01:15", se: "F17", dur: "1hr 15m" },
+        { id: 2, n: "Computer Science P1", b: "OCR", d: new Date(2026, 4, 13), s: "PM", t: ["Computer Systems"], st: "01:15", se: "17", dur: "1hr 30m" },
+        { id: 3, n: "Maths Paper 1", b: "Pearson", d: new Date(2026, 4, 14), s: "AM", t: ["Non-Calculator: All Topics"], st: "09:00", se: "H15", dur: "1hr 30m" },
+        { id: 4, n: "History Paper 1", b: "Pearson", d: new Date(2026, 4, 15), s: "AM", t: ["Medicine in Britain/Western Front"], st: "09:00", se: "113", dur: "1hr 20m" },
+        { id: 5, n: "Chemistry Paper 1", b: "AQA", d: new Date(2026, 4, 18), s: "AM", t: ["Atomic Structure", "Bonding", "Quantitative Chemistry", "Chemical Changes", "Energy Changes"], st: "09:00", se: "F17", dur: "1hr 15m" },
+        { id: 6, n: "English Literature P2", b: "AQA", d: new Date(2026, 4, 19), s: "AM", t: ["Inspector Calls", "Power and Conflict Poetry", "Unseen Poetry"], st: "09:00", se: "G14", dur: "2hr 15m" },
+        { id: 7, n: "Computer Science P2", b: "OCR", d: new Date(2026, 4, 19), s: "PM", t: ["Computational Thinking", "Algorithms", "Programming"], st: "01:15", se: "C7", dur: "1hr 30m" },
+        { id: 8, n: "English Language P1", b: "AQA", d: new Date(2026, 4, 21), s: "AM", t: ["Creative Writing", "Analysis"], st: "09:00", se: "G14", dur: "1hr 45m" },
+        { id: 9, n: "Engineering", b: "AQA", d: new Date(2026, 5, 1), s: "AM", t: ["All Topics"], st: "09:00", se: "C8", dur: "2hr 00m" },
+        { id: 10, n: "Physics Paper 1", b: "AQA", d: new Date(2026, 5, 2), s: "AM", t: ["Energy", "Electricity", "Particle Model", "Atomic Structure"], st: "09:00", se: "F17", dur: "1hr 15m" },
+        { id: 11, n: "Maths Paper 2", b: "Pearson", d: new Date(2026, 5, 3), s: "AM", t: ["Calculator: All Topics"], st: "09:00", se: "H15", dur: "1hr 30m" },
+        { id: 12, n: "History Paper 2", b: "Pearson", d: new Date(2026, 5, 4), s: "AM", t: ["Cold War", "Anglo-Saxon and Norman England"], st: "09:00", se: "E8", dur: "1hr 50m" },
+        { id: 13, n: "English Language P2", b: "AQA", d: new Date(2026, 5, 5), s: "AM", t: ["Non-Fiction Writing"], st: "09:00", se: "G14", dur: "1hr 45m" },
+        { id: 14, n: "Biology Paper 2", b: "AQA", d: new Date(2026, 5, 8), s: "AM", t: ["Homeostasis", "Inheritance", "Ecology"], st: "09:00", se: "F17", dur: "1hr 15m" },
+        { id: 15, n: "Spanish Listening", b: "Pearson", d: new Date(2026, 5, 9), s: "AM", t: ["All Topics"], st: "09:15", se: "C3", dur: "0hr 45m" },
+        { id: 16, n: "History Paper 3", b: "Pearson", d: new Date(2026, 5, 9), s: "PM", t: ["Weimar and Nazi Germany"], st: "01:15", se: "110", dur: "1hr 30m" },
+        { id: 17, n: "Maths Paper 3", b: "Pearson", d: new Date(2026, 5, 10), s: "AM", t: ["Calculator: All Topics"], st: "09:00", se: "H15", dur: "1hr 30m" },
+        { id: 18, n: "Chemistry Paper 2", b: "AQA", d: new Date(2026, 5, 12), s: "AM", t: ["Rates", "Organic", "Analysis", "Atmosphere", "Resources"], st: "09:00", se: "F17", dur: "1hr 15m" },
+        { id: 19, n: "Physics Paper 2", b: "AQA", d: new Date(2026, 5, 15), s: "AM", t: ["Forces", "Waves", "Magnetism"], st: "09:00", se: "F17", dur: "1hr 15m" },
+        { id: 20, n: "Spanish Reading", b: "Pearson", d: new Date(2026, 5, 16), s: "AM", t: ["All Topics"], st: "09:15", se: "F9", dur: "0hr 45m" },
+        { id: 21, n: "Spanish Writing", b: "Pearson", d: new Date(2026, 5, 17), s: "AM", t: ["All Topics"], st: "09:00", se: "F9", dur: "1hr 15m" }
     ];
 
     let userPriorities = JSON.parse(localStorage.getItem('gcse_priorities')) || {};
     let currentExamId = null;
     let timeLeft = 25 * 60; let timerInterval;
     const today = new Date(); today.setHours(0,0,0,0);
+
+    // Calculates end time using start time string (e.g. "09:00") and duration (e.g. "1hr 45m")
+    function getEndTime(startTimeStr, durationStr) {
+        if (!startTimeStr || !durationStr) return "--:--";
+        const [startHours, startMinutes] = startTimeStr.split(':').map(Number);
+        
+        let hrMatch = durationStr.match(/(\d+)hr/);
+        let minMatch = durationStr.match(/(\d+)m/);
+        
+        let durHours = hrMatch ? Number(hrMatch[1]) : 0;
+        let durMinutes = minMatch ? Number(minMatch[1]) : 0;
+        
+        let endMinutes = startMinutes + durMinutes;
+        let endHours = startHours + durHours + Math.floor(endMinutes / 60);
+        endMinutes = endMinutes % 60;
+        
+        return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+    }
 
     function showPage(pId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -232,14 +281,20 @@
             const pLevel = userPriorities[e.id] || 0;
             const pColor = pLevel == 3 ? 'var(--p-high)' : pLevel == 2 ? 'var(--p-mid)' : pLevel == 1 ? 'var(--p-low)' : 'transparent';
             
+            const endTime = getEndTime(e.st, e.dur);
+            const seatDisplay = e.se ? `<span class="seat-badge">Seat: ${e.se}</span>` : '';
+
             const card = document.createElement('div');
             card.className = `card ${urgencyClass}`;
             card.onclick = () => openModal(e);
             card.innerHTML = `<span class="card-title"><span class="p-dot" style="background:${pColor}"></span>${e.n}</span>
                 <div class="footer">
-                    <span>${e.b} • ${e.d.toLocaleDateString('en-GB', {day:'numeric', month:'short'})}</span>
-                    <div>
-                        <span class="start-time">${e.st}</span>
+                    <div class="footer-left">
+                        <span>${e.b} • ${e.d.toLocaleDateString('en-GB', {day:'numeric', month:'short'})}</span>
+                        ${seatDisplay}
+                    </div>
+                    <div class="footer-right">
+                        <span class="time-badge"><span class="time-highlight">${e.st}</span> - ${endTime}</span>
                         <span class="session-badge ${e.s.toLowerCase()}">${e.s}</span>
                     </div>
                 </div>`;
@@ -269,8 +324,12 @@
 
     function openModal(e) {
         currentExamId = e.id;
+        const endTime = getEndTime(e.st, e.dur);
         document.getElementById('m-title').innerText = e.n;
-        document.getElementById('m-list').innerHTML = `<li><strong>Time:</strong> ${e.st}</li>` + e.t.map(x => `<li>→ ${x}</li>`).join('');
+        document.getElementById('m-list').innerHTML = 
+            `<li><strong>Time:</strong> ${e.st} - ${endTime} (${e.dur})</li>` + 
+            `<li><strong>Seat Number:</strong> ${e.se || 'TBA'}</li>` +
+            e.t.map(x => `<li>→ ${x}</li>`).join('');
         document.getElementById('overlay').style.display = 'flex';
     }
 
