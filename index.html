@@ -201,16 +201,15 @@
 </div>
 
 <script>
-    // Data populated and updated directly from ExamTimetable.pdf
     const exams = [
         { id: 0, n: "English Literature P1", b: "AQA", d: new Date(2026, 4, 11), s: "AM", t: ["Macbeth", "Jekyll and Hyde"], st: "09:00", se: "G14", dur: "1hr 45m" },
-        { id: 1, n: "Biology Paper 1", b: "AQA", d: new Date(2026, 4, 12), s: "PM", t: ["Cell Biology", "Organisation", "Infection and Response", "Bioenergetics"], st: "01:15", se: "F17", dur: "1hr 15m" },
-        { id: 2, n: "Computer Science P1", b: "OCR", d: new Date(2026, 4, 13), s: "PM", t: ["Computer Systems"], st: "01:15", se: "17", dur: "1hr 30m" },
+        { id: 1, n: "Biology Paper 1", b: "AQA", d: new Date(2026, 4, 12), s: "PM", t: ["Cell Biology", "Organisation", "Infection and Response", "Bioenergetics"], st: "13:15", se: "F17", dur: "1hr 15m" },
+        { id: 2, n: "Computer Science P1", b: "OCR", d: new Date(2026, 4, 13), s: "PM", t: ["Computer Systems"], st: "13:15", se: "17", dur: "1hr 30m" },
         { id: 3, n: "Maths Paper 1", b: "Pearson", d: new Date(2026, 4, 14), s: "AM", t: ["Non-Calculator: All Topics"], st: "09:00", se: "H15", dur: "1hr 30m" },
         { id: 4, n: "History Paper 1", b: "Pearson", d: new Date(2026, 4, 15), s: "AM", t: ["Medicine in Britain/Western Front"], st: "09:00", se: "113", dur: "1hr 20m" },
         { id: 5, n: "Chemistry Paper 1", b: "AQA", d: new Date(2026, 4, 18), s: "AM", t: ["Atomic Structure", "Bonding", "Quantitative Chemistry", "Chemical Changes", "Energy Changes"], st: "09:00", se: "F17", dur: "1hr 15m" },
         { id: 6, n: "English Literature P2", b: "AQA", d: new Date(2026, 4, 19), s: "AM", t: ["Inspector Calls", "Power and Conflict Poetry", "Unseen Poetry"], st: "09:00", se: "G14", dur: "2hr 15m" },
-        { id: 7, n: "Computer Science P2", b: "OCR", d: new Date(2026, 4, 19), s: "PM", t: ["Computational Thinking", "Algorithms", "Programming"], st: "01:15", se: "C7", dur: "1hr 30m" },
+        { id: 7, n: "Computer Science P2", b: "OCR", d: new Date(2026, 4, 19), s: "PM", t: ["Computational Thinking", "Algorithms", "Programming"], st: "13:15", se: "C7", dur: "1hr 30m" },
         { id: 8, n: "English Language P1", b: "AQA", d: new Date(2026, 4, 21), s: "AM", t: ["Creative Writing", "Analysis"], st: "09:00", se: "G14", dur: "1hr 45m" },
         { id: 9, n: "Engineering", b: "AQA", d: new Date(2026, 5, 1), s: "AM", t: ["All Topics"], st: "09:00", se: "C8", dur: "2hr 00m" },
         { id: 10, n: "Physics Paper 1", b: "AQA", d: new Date(2026, 5, 2), s: "AM", t: ["Energy", "Electricity", "Particle Model", "Atomic Structure"], st: "09:00", se: "F17", dur: "1hr 15m" },
@@ -219,7 +218,7 @@
         { id: 13, n: "English Language P2", b: "AQA", d: new Date(2026, 5, 5), s: "AM", t: ["Non-Fiction Writing"], st: "09:00", se: "G14", dur: "1hr 45m" },
         { id: 14, n: "Biology Paper 2", b: "AQA", d: new Date(2026, 5, 8), s: "AM", t: ["Homeostasis", "Inheritance", "Ecology"], st: "09:00", se: "F17", dur: "1hr 15m" },
         { id: 15, n: "Spanish Listening", b: "Pearson", d: new Date(2026, 5, 9), s: "AM", t: ["All Topics"], st: "09:15", se: "C3", dur: "0hr 45m" },
-        { id: 16, n: "History Paper 3", b: "Pearson", d: new Date(2026, 5, 9), s: "PM", t: ["Weimar and Nazi Germany"], st: "01:15", se: "110", dur: "1hr 30m" },
+        { id: 16, n: "History Paper 3", b: "Pearson", d: new Date(2026, 5, 9), s: "PM", t: ["Weimar and Nazi Germany"], st: "13:15", se: "110", dur: "1hr 30m" },
         { id: 17, n: "Maths Paper 3", b: "Pearson", d: new Date(2026, 5, 10), s: "AM", t: ["Calculator: All Topics"], st: "09:00", se: "H15", dur: "1hr 30m" },
         { id: 18, n: "Chemistry Paper 2", b: "AQA", d: new Date(2026, 5, 12), s: "AM", t: ["Rates", "Organic", "Analysis", "Atmosphere", "Resources"], st: "09:00", se: "F17", dur: "1hr 15m" },
         { id: 19, n: "Physics Paper 2", b: "AQA", d: new Date(2026, 5, 15), s: "AM", t: ["Forces", "Waves", "Magnetism"], st: "09:00", se: "F17", dur: "1hr 15m" },
@@ -230,9 +229,16 @@
     let userPriorities = JSON.parse(localStorage.getItem('gcse_priorities')) || {};
     let currentExamId = null;
     let timeLeft = 25 * 60; let timerInterval;
-    const today = new Date(); today.setHours(0,0,0,0);
 
-    // Calculates end time using start time string (e.g. "09:00") and duration (e.g. "1hr 45m")
+    // Helper to get exact Date object for when an exam finishes
+    function getExamExactEndDateTime(examObj) {
+        const endStr = getEndTime(examObj.st, examObj.dur);
+        const [hours, minutes] = endStr.split(':').map(Number);
+        const endDateTime = new Date(examObj.d.getTime());
+        endDateTime.setHours(hours, minutes, 0, 0);
+        return endDateTime;
+    }
+
     function getEndTime(startTimeStr, durationStr) {
         if (!startTimeStr || !durationStr) return "--:--";
         const [startHours, startMinutes] = startTimeStr.split(':').map(Number);
@@ -250,6 +256,16 @@
         return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
     }
 
+    // Formats 24h internal strings back to readable text for presentation
+    function formatTimeDisplay(timeStr) {
+        const [h, m] = timeStr.split(':');
+        const hr = Number(h);
+        if (hr >= 12) {
+            return `${hr === 12 ? 12 : hr - 12}:${m} PM`;
+        }
+        return `${timeStr} AM`;
+    }
+
     function showPage(pId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -263,14 +279,22 @@
         if (!g) return;
         g.innerHTML = '';
 
-        const completedExams = exams.filter(e => e.d.getTime() < today.getTime());
+        const now = new Date();
+
+        // An exam is complete only if the current time is past its exact calculated end time
+        const completedExams = exams.filter(e => now.getTime() >= getExamExactEndDateTime(e).getTime());
         document.getElementById('progress-fill').style.width = ((completedExams.length / exams.length) * 100) + "%";
         document.getElementById('exams-completed').innerText = completedExams.length;
         document.getElementById('total-exams').innerText = exams.length;
 
-        const visibleFuture = exams.filter(e => e.d.getTime() >= today.getTime());
+        // Future or currently active exams
+        const visibleFuture = exams.filter(e => now.getTime() < getExamExactEndDateTime(e).getTime());
+        
         visibleFuture.forEach(e => {
-            const timeDiff = e.d.getTime() - today.getTime();
+            const todayMidnight = new Date(now.getTime()); todayMidnight.setHours(0,0,0,0);
+            const examMidnight = new Date(e.d.getTime()); examMidnight.setHours(0,0,0,0);
+            
+            const timeDiff = examMidnight.getTime() - todayMidnight.getTime();
             const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
             
             let urgencyClass = '';
@@ -294,31 +318,36 @@
                         ${seatDisplay}
                     </div>
                     <div class="footer-right">
-                        <span class="time-badge"><span class="time-highlight">${e.st}</span> - ${endTime}</span>
+                        <span class="time-badge"><span class="time-highlight">${formatTimeDisplay(e.st)}</span> - ${formatTimeDisplay(endTime)}</span>
                         <span class="session-badge ${e.s.toLowerCase()}">${e.s}</span>
                     </div>
                 </div>`;
             g.appendChild(card);
         });
 
-        const nextSub = visibleFuture.find(ex => ex.d.getTime() !== today.getTime());
+        // The exact next exam up
+        const nextSub = visibleFuture[0];
         document.getElementById('next-subject-text').innerText = nextSub ? nextSub.n : "Finished!";
     }
 
     function updateCountdowns() {
-        const getDays = (target) => Math.max(0, Math.ceil((target - today) / (1000 * 60 * 60 * 24)));
+        const now = new Date();
+        const getDays = (target) => Math.max(0, Math.ceil((target - now) / (1000 * 60 * 60 * 24)));
+        
         const leavers = new Date(2026, 4, 22);
         const prom = new Date(2026, 5, 25);
         const last = exams[exams.length - 1];
 
         document.getElementById('c-leavers').innerText = getDays(leavers);
         document.getElementById('c-prom').innerText = getDays(prom);
-        document.getElementById('c-last').innerText = getDays(last.d);
+        
+        const lastExamEnd = getExamExactEndDateTime(last);
+        document.getElementById('c-last').innerText = getDays(lastExamEnd);
         document.getElementById('c-last-date').innerText = last.d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
 
         const relaxCount = document.getElementById('relax-big-count');
         if(relaxCount) {
-            relaxCount.innerText = getDays(last.d);
+            relaxCount.innerText = getDays(lastExamEnd);
         }
     }
 
@@ -327,7 +356,7 @@
         const endTime = getEndTime(e.st, e.dur);
         document.getElementById('m-title').innerText = e.n;
         document.getElementById('m-list').innerHTML = 
-            `<li><strong>Time:</strong> ${e.st} - ${endTime} (${e.dur})</li>` + 
+            `<li><strong>Time:</strong> ${formatTimeDisplay(e.st)} - ${formatTimeDisplay(endTime)} (${e.dur})</li>` + 
             `<li><strong>Seat Number:</strong> ${e.se || 'TBA'}</li>` +
             e.t.map(x => `<li>→ ${x}</li>`).join('');
         document.getElementById('overlay').style.display = 'flex';
@@ -362,10 +391,13 @@
     }
 
     function pickRandom() {
-        const visible = exams.filter(e => e.d.getTime() >= today.getTime());
+        const now = new Date();
+        const visible = exams.filter(e => now.getTime() < getExamExactEndDateTime(e).getTime());
         if(visible.length) openModal(visible[Math.floor(Math.random()*visible.length)]);
     }
 
+    // Set a tiny automated interval to refresh the screen layout dynamically 
+    setInterval(renderGrid, 30000); // checks every 30 seconds
     renderGrid();
 </script>
 </body>
