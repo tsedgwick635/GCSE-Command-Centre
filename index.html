@@ -63,6 +63,7 @@
         
         .progress-container { margin-bottom: 30px; }
         .progress-text { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; font-weight: bold; }
+        .exams-left-badge { color: var(--acc); font-weight: bold; background: rgba(56, 189, 248, 0.1); padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(56, 189, 248, 0.2); }
         .progress-bg { background: #334155; height: 12px; border-radius: 10px; overflow: hidden; }
         #progress-fill { background: linear-gradient(90deg, var(--acc), #818cf8); height: 100%; width: 0%; transition: width 1s ease-in-out; }
         
@@ -133,8 +134,8 @@
     </div>
     <div class="progress-container">
         <div class="progress-text">
-            <span>Progress</span>
-            <span><span id="exams-completed">0</span>/<span id="total-exams">0</span> Done</span>
+            <span>Progress (<span id="exams-completed">0</span>/<span id="total-exams">0</span> Completed)</span>
+            <span class="exams-left-badge"><span id="exams-remaining">0</span> Exams Left</span>
         </div>
         <div class="progress-bg"><div id="progress-fill"></div></div>
     </div>
@@ -283,9 +284,12 @@
 
         // An exam is complete only if the current time is past its exact calculated end time
         const completedExams = exams.filter(e => now.getTime() >= getExamExactEndDateTime(e).getTime());
+        const remainingExamsCount = exams.length - completedExams.length;
+
         document.getElementById('progress-fill').style.width = ((completedExams.length / exams.length) * 100) + "%";
         document.getElementById('exams-completed').innerText = completedExams.length;
         document.getElementById('total-exams').innerText = exams.length;
+        document.getElementById('exams-remaining').innerText = remainingExamsCount;
 
         // Future or currently active exams
         const visibleFuture = exams.filter(e => now.getTime() < getExamExactEndDateTime(e).getTime());
