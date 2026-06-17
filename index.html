@@ -91,9 +91,40 @@
         .resource-card h4 { margin: 0; font-size: 0.95rem; color: white; }
 
         .countdown-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .milestone-card { background: var(--card); padding: 30px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .days-number { font-size: 4rem; font-weight: 900; display: block; color: white; margin: 10px 0; }
-        .milestone-date { color: var(--dim); font-size: 0.8rem; }
+        
+        .milestone-card { 
+            background: var(--card); 
+            padding: 30px; 
+            border-radius: 20px; 
+            text-align: center; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            position: relative; 
+            overflow: hidden; 
+        }
+        .days-number { font-size: 4rem; font-weight: 900; display: block; color: white; margin: 10px 0; position: relative; z-index: 2; }
+        .milestone-date { color: var(--dim); font-size: 0.8rem; position: relative; z-index: 2; }
+        .milestone-card h2 { position: relative; z-index: 2; }
+
+        /* Updated diagonal watermark style with higher opacity text */
+        .watermark-done {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            font-size: 6.5rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.1); /* Changed from 0.035 to 0.1 */
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 1;
+            user-select: none;
+        }
+        
+        .card-completed .watermark-done {
+            display: block;
+        }
 
         .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display:none; justify-content:center; align-items:center; z-index:100; backdrop-filter: blur(5px); }
         .modal { background: var(--card); padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; border: 1px solid var(--acc); }
@@ -106,6 +137,29 @@
         .time-badge { color: var(--dim); font-size: 0.75rem; }
         .time-highlight { color: var(--acc); font-weight: bold; }
         .seat-badge { background: #475569; color: white; font-size: 0.7rem; padding: 1px 5px; border-radius: 3px; font-weight: bold; }
+        
+        .finished-container {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(56, 189, 248, 0.1) 100%);
+            border-radius: 20px;
+            border: 2px dashed var(--today-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .finished-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--today-border);
+            margin: 0 0 10px 0;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .finished-subtitle {
+            color: var(--dim);
+            font-size: 1.1rem;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -164,20 +218,23 @@
 <div id="page-count" class="page">
     <h1 style="text-align:center; margin-bottom: 30px;">Countdowns</h1>
     <div class="countdown-container">
-        <div class="milestone-card">
+        <div class="milestone-card" id="card-leavers">
             <h2 style="color:var(--milestone); font-size: 0.9rem; margin:0;">LEAVERS DAY</h2>
             <span class="days-number" id="c-leavers">--</span>
             <div class="milestone-date">Friday, 22nd May 2026</div>
+            <div class="watermark-done">done</div>
         </div>
-        <div class="milestone-card" style="border-color: var(--acc);">
+        <div class="milestone-card" id="card-last" style="border-color: var(--acc);">
             <h2 style="color:var(--acc); font-size: 0.9rem; margin:0;">LAST EXAM</h2>
             <span class="days-number" id="c-last">--</span>
             <div class="milestone-date" id="c-last-date">--</div>
+            <div class="watermark-done">done</div>
         </div>
-        <div class="milestone-card">
+        <div class="milestone-card" id="card-prom">
             <h2 style="color:var(--milestone); font-size: 0.9rem; margin:0;">PROM</h2>
             <span class="days-number" id="c-prom">--</span>
             <div class="milestone-date">Thursday, 25th June 2026</div>
+            <div class="watermark-done">done</div>
         </div>
     </div>
 </div>
@@ -218,8 +275,8 @@
         { id: 12, n: "History Paper 2", b: "Pearson", d: new Date(2026, 5, 4), s: "AM", t: ["Cold War", "Anglo-Saxon and Norman England"], st: "09:00", se: "E8", dur: "1hr 50m" },
         { id: 13, n: "English Language P2", b: "AQA", d: new Date(2026, 5, 5), s: "AM", t: ["Non-Fiction Writing"], st: "09:00", se: "G14", dur: "1hr 45m" },
         { id: 14, n: "Biology Paper 2", b: "AQA", d: new Date(2026, 5, 8), s: "AM", t: ["Homeostasis", "Inheritance", "Ecology"], st: "09:00", se: "F17", dur: "1hr 15m" },
-        { id: 15, n: "Spanish Listening", b: "Pearson", d: new Date(2026, 5, 9), s: "AM", t: ["All Topics"], st: "09:15", se: "L1, C3", dur: "0hr 45m" },
-        { id: 16, n: "History Paper 3", b: "Pearson", d: new Date(2026, 5, 9), s: "PM", t: ["Weimar and Nazi Germany"], st: "13:15", se: "I10", dur: "1hr 30m" },
+        { id: 15, n: "Spanish Listening", b: "Pearson", d: new Date(2026, 5, 9), s: "AM", t: ["All Topics"], st: "09:15", se: "C3", dur: "0hr 45m" },
+        { id: 16, n: "History Paper 3", b: "Pearson", d: new Date(2026, 5, 9), s: "PM", t: ["Weimar and Nazi Germany"], st: "13:15", se: "110", dur: "1hr 30m" },
         { id: 17, n: "Maths Paper 3", b: "Pearson", d: new Date(2026, 5, 10), s: "AM", t: ["Calculator: All Topics"], st: "09:00", se: "H15", dur: "1hr 30m" },
         { id: 18, n: "Chemistry Paper 2", b: "AQA", d: new Date(2026, 5, 12), s: "AM", t: ["Rates", "Organic", "Analysis", "Atmosphere", "Resources"], st: "09:00", se: "F17", dur: "1hr 15m" },
         { id: 19, n: "Physics Paper 2", b: "AQA", d: new Date(2026, 5, 15), s: "AM", t: ["Forces", "Waves", "Magnetism"], st: "09:00", se: "F17", dur: "1hr 15m" },
@@ -231,7 +288,6 @@
     let currentExamId = null;
     let timeLeft = 25 * 60; let timerInterval;
 
-    // Helper to get exact Date object for when an exam finishes
     function getExamExactEndDateTime(examObj) {
         const endStr = getEndTime(examObj.st, examObj.dur);
         const [hours, minutes] = endStr.split(':').map(Number);
@@ -240,6 +296,7 @@
         return endDateTime;
     }
 
+    // Helper functions for timing logic
     function getEndTime(startTimeStr, durationStr) {
         if (!startTimeStr || !durationStr) return "--:--";
         const [startHours, startMinutes] = startTimeStr.split(':').map(Number);
@@ -257,7 +314,6 @@
         return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
     }
 
-    // Formats 24h internal strings back to readable text for presentation
     function formatTimeDisplay(timeStr) {
         const [h, m] = timeStr.split(':');
         const hr = Number(h);
@@ -265,6 +321,10 @@
             return `${hr === 12 ? 12 : hr - 12}:${m} PM`;
         }
         return `${timeStr} AM`;
+    }
+
+    function formatCountdownValue(daysRemaining) {
+        return daysRemaining <= 0 ? "🎉" : daysRemaining;
     }
 
     function showPage(pId) {
@@ -282,7 +342,6 @@
 
         const now = new Date();
 
-        // An exam is complete only if the current time is past its exact calculated end time
         const completedExams = exams.filter(e => now.getTime() >= getExamExactEndDateTime(e).getTime());
         const remainingExamsCount = exams.length - completedExams.length;
 
@@ -291,8 +350,19 @@
         document.getElementById('total-exams').innerText = exams.length;
         document.getElementById('exams-remaining').innerText = remainingExamsCount;
 
-        // Future or currently active exams
         const visibleFuture = exams.filter(e => now.getTime() < getExamExactEndDateTime(e).getTime());
+        
+        if (visibleFuture.length === 0) {
+            const finishedBlock = document.createElement('div');
+            finishedBlock.className = 'finished-container';
+            finishedBlock.innerHTML = `
+                <h1 class="finished-title">All Exams Finished!</h1>
+                <p class="finished-subtitle">Time to celebrate! 🎉 Freedom is officially here.</p>
+            `;
+            g.appendChild(finishedBlock);
+            document.getElementById('next-subject-text').innerText = "Finished!";
+            return;
+        }
         
         visibleFuture.forEach(e => {
             const todayMidnight = new Date(now.getTime()); todayMidnight.setHours(0,0,0,0);
@@ -312,7 +382,6 @@
             const endTime = getEndTime(e.st, e.dur);
             const seatDisplay = e.se ? `<span class="seat-badge">Seat: ${e.se}</span>` : '';
 
-            // Formatting option includes weekday (e.g., "Mon, 11 May")
             const dateFormatted = e.d.toLocaleDateString('en-GB', {weekday: 'short', day: 'numeric', month: 'short'});
 
             const card = document.createElement('div');
@@ -332,7 +401,6 @@
             g.appendChild(card);
         });
 
-        // The exact next exam up
         const nextSub = visibleFuture[0];
         document.getElementById('next-subject-text').innerText = nextSub ? nextSub.n : "Finished!";
     }
@@ -345,16 +413,25 @@
         const prom = new Date(2026, 5, 25);
         const last = exams[exams.length - 1];
 
-        document.getElementById('c-leavers').innerText = getDays(leavers);
-        document.getElementById('c-prom').innerText = getDays(prom);
-        
+        const daysLeavers = getDays(leavers);
+        const daysProm = getDays(prom);
         const lastExamEnd = getExamExactEndDateTime(last);
-        document.getElementById('c-last').innerText = getDays(lastExamEnd);
+        const totalRemainingDays = getDays(lastExamEnd);
+
+        // Update Text Fields
+        document.getElementById('c-leavers').innerText = formatCountdownValue(daysLeavers);
+        document.getElementById('c-prom').innerText = formatCountdownValue(daysProm);
+        document.getElementById('c-last').innerText = formatCountdownValue(totalRemainingDays);
         document.getElementById('c-last-date').innerText = last.d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
+
+        // Toggle watermark states based on actual countdown expiration status
+        document.getElementById('card-leavers').classList.toggle('card-completed', daysLeavers <= 0);
+        document.getElementById('card-prom').classList.toggle('card-completed', daysProm <= 0);
+        document.getElementById('card-last').classList.toggle('card-completed', totalRemainingDays <= 0);
 
         const relaxCount = document.getElementById('relax-big-count');
         if(relaxCount) {
-            relaxCount.innerText = getDays(lastExamEnd);
+            relaxCount.innerText = formatCountdownValue(totalRemainingDays);
         }
     }
 
@@ -403,8 +480,7 @@
         if(visible.length) openModal(visible[Math.floor(Math.random()*visible.length)]);
     }
 
-    // Set a tiny automated interval to refresh the screen layout dynamically 
-    setInterval(renderGrid, 30000); // checks every 30 seconds
+    setInterval(renderGrid, 30000);
     renderGrid();
 </script>
 </body>
